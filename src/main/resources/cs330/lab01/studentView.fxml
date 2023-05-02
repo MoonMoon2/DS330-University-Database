@@ -77,8 +77,8 @@
                               <Font size="20.0" />
                            </font>
                         </Label>
-                        <ComboBox prefHeight="26.0" prefWidth="420.0" GridPane.columnIndex="1" />
-                        <ChoiceBox prefWidth="150.0" GridPane.columnIndex="2" />
+                        <ComboBox fx:id="searchBar" editable="true" onAction="#searchUpdate" prefHeight="26.0" prefWidth="420.0" GridPane.columnIndex="1" />
+                        <ChoiceBox fx:id="searchType" prefWidth="150.0" GridPane.columnIndex="2" />
                      </children>
                   </GridPane>
                   <GridPane alignment="CENTER" GridPane.columnIndex="1">

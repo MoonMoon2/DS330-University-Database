@@ -20,7 +20,7 @@ public class App extends Application {
 
 	private static Scene scene;
 	
-	public static final double PASSING_GRADE = 0.7;
+	public static final double PASSING_GRADE = 1.0;
 	
 	private StartupDao dao = new StartupDao();
 	private HandleManager hm = new HandleManager();
