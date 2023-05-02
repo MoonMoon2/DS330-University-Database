@@ -3,67 +3,105 @@ package cs330.lab01.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Dumb Course Data Wrapper (does no calculations, just holds data)
+ * 
+ * @author Tobias Ward
+ *
+ */
 public class Course implements Serializable {
 	
 	private static final long serialVersionUID = 1859582728465136180L;
 	
-	int id;
-	String title, dept_name;
-	int credits;
+	private int courseId, secId;
+	private String title, deptName, semester;
+	private int year, credits;
+	
 	
 	
 	/**
-	 * @param id
-	 * @param title
-	 * @param dept_name
-	 * @param credits
+	 * Basic test course object
 	 */
-	public Course(int id, String title, String dept_name, int credits) {
+	public Course() {
 		super();
-		this.id = id;
-		this.title = title;
-		this.dept_name = dept_name;
-		this.credits = credits;
+		
 	}
 
+	/**
+	 * @param courseId
+	 * @param secId
+	 * @param title
+	 * @param deptName
+	 * @param semester
+	 * @param year
+	 * @param credits
+	 */
+	public Course(int courseId, int secId, String title, String deptName, String semester, int year, int credits) {
+		super();
+		this.courseId = courseId;
+		this.secId = secId;
+		this.title = title;
+		this.deptName = deptName;
+		this.semester = semester;
+		this.year = year;
+		this.credits = credits;
+	}
+	
 	/*
 	 * 					GETTERS AND SETTERS
 	 */
 
-	public int getId() {
-		return id;
+	public int getCourseId() {
+		return courseId;
 	}
 
-
-	public void setId(int id) {
-		this.id = id;
+	public void setCourseId(int courseId) {
+		this.courseId = courseId;
 	}
 
+	public int getSecId() {
+		return secId;
+	}
+
+	public void setSecId(int secId) {
+		this.secId = secId;
+	}
 
 	public String getTitle() {
 		return title;
 	}
 
-
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
-
-	public String getDept_name() {
-		return dept_name;
+	public String getDeptName() {
+		return deptName;
 	}
 
-
-	public void setDept_name(String dept_name) {
-		this.dept_name = dept_name;
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
 	}
 
+	public String getSemester() {
+		return semester;
+	}
+
+	public void setSemester(String semester) {
+		this.semester = semester;
+	}
+
+	public int getYear() {
+		return year;
+	}
+
+	public void setYear(int year) {
+		this.year = year;
+	}
 
 	public int getCredits() {
 		return credits;
 	}
-
 
 	public void setCredits(int credits) {
 		this.credits = credits;
@@ -72,10 +110,10 @@ public class Course implements Serializable {
 	/*
 	 *			HASHCODE AND EQUALS 
 	 */
-	
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(credits, dept_name, id, title);
+		return Objects.hash(courseId, deptName, secId, semester, year);
 	}
 
 	@Override
@@ -87,8 +125,12 @@ public class Course implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Course other = (Course) obj;
-		return credits == other.credits && Objects.equals(dept_name, other.dept_name) && id == other.id
-				&& Objects.equals(title, other.title);
+		return courseId == other.courseId && Objects.equals(deptName, other.deptName) && secId == other.secId
+				&& Objects.equals(semester, other.semester) && year == other.year;
 	}
+	
+	
+	
+	
 	
 }

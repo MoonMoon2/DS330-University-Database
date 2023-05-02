@@ -11,6 +11,7 @@ public class C3poConnectionHandler {
 	public static final String CONNECTION_STRING = "jdbc:sqlite:src/main/resources/cs330/lab01/databases/uni.db";
 	
 	public static ComboPooledDataSource dataSource = new ComboPooledDataSource();
+
 	
 	/**
 	 * Create the datasource from the CONNECTION_STRING using JDBC
@@ -22,7 +23,7 @@ public class C3poConnectionHandler {
 		dataSource.setInitialPoolSize(3);
 		dataSource.setMinPoolSize(2);
 		dataSource.setAcquireIncrement(5);
-		dataSource.setMaxPoolSize(8);
+		dataSource.setMaxPoolSize(30);
 		
 	}
 	

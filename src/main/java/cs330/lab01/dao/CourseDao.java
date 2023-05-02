@@ -19,7 +19,7 @@ public interface CourseDao {
 	 * @param id id of the Course you want to find
 	 * @return
 	 */
-	public Course getCourse(int id);
+	Course getCourse(int course_id, int sec_id, String semester, int year);
 	
 	/**
 	 * Returns a list of all Courses in the database, in the order that SQL returns them
@@ -67,6 +67,6 @@ public interface CourseDao {
 	 * @param id
 	 * @return
 	 */
-	public boolean deleteCourseById(int id);
+	public boolean deleteCourseById(int course_id, int sec_id, String semester, int year);
 	
 }

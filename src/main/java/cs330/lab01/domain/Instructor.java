@@ -2,15 +2,24 @@ package cs330.lab01.domain;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * Dumb data-wrapper for instructor objects.
+ * 
+ * Keeps a record of advisees as well.
+ * 
+ * @author Tobias Ward
+ *
+ */
 public class Instructor implements Serializable {
 
 
 	private static final long serialVersionUID = 4411008670103001638L;
 
 	int id;
-	String name, dept_name;
+	String name, deptName;
 	double salary;
 
 	List<Student> advisees;
@@ -25,86 +34,43 @@ public class Instructor implements Serializable {
 	/**
 	 * @param id
 	 * @param name
-	 * @param dept_name
+	 * @param deptName
 	 * @param salary
-	 * @param advisees
 	 */
-	public Instructor(int id, String name, String dept_name, double salary, List<Student> advisees) {
+	public Instructor(int id, String name, String deptName, double salary) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.dept_name = dept_name;
+		this.deptName = deptName;
 		this.salary = salary;
-		this.advisees = advisees;
+		
+		advisees = new ArrayList<Student>();
 	}
 
-	/*
-	 * 					GETTERS AND SETTERS
+
+
+	/**
+	 * @param id
+	 * @param name
+	 * @param deptName
+	 * @param salary
+	 * @param advisees
 	 */
-
-	public Instructor(int int1, String string, String string2, double double1) {
-		// TODO Auto-generated constructor stub
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
+	public Instructor(int id, String name, String deptName, double salary, List<Student> advisees) {
+		super();
 		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getDept_name() {
-		return dept_name;
-	}
-
-	public void setDept_name(String dept_name) {
-		this.dept_name = dept_name;
-	}
-
-	public double getSalary() {
-		return salary;
-	}
-
-	public void setSalary(double salary) {
+		this.deptName = deptName;
 		this.salary = salary;
-	}
-
-	public List<Student> getAdvisees() {
-		return advisees;
-	}
-
-	public void setAdvisees(List<Student> advisees) {
 		this.advisees = advisees;
-	}
-	
-	public void addAdvisees(Student ... students) {
-		for (Student stud : students) {
-			advisees.add(stud);
-		}
-	}
-	
-	public void removeAdvisees(Student ... students) {
-		for (Student stud : students) {
-			advisees.remove(stud);
-		}
 	}
 
 	/*
-	 *			HASHCODE AND EQUALS 
+	 * 	Getters, Setters, equals, and hashCode
 	 */
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(advisees, dept_name, id, name, salary);
+	public void addAdvisee(Student student) {
+		advisees.add(student);
 	}
 
 	@Override
@@ -116,12 +82,66 @@ public class Instructor implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Instructor other = (Instructor) obj;
-		return Objects.equals(advisees, other.advisees) && Objects.equals(dept_name, other.dept_name)
-				&& Objects.equals(id, other.id) && Objects.equals(name, other.name)
+		return Objects.equals(deptName, other.deptName) && id == other.id && Objects.equals(name, other.name)
 				&& Double.doubleToLongBits(salary) == Double.doubleToLongBits(other.salary);
 	}
 
+	public List<Student> getAdvisees() {
+		return advisees;
+	}
 
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public double getSalary() {
+		return salary;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(deptName, id, name, salary);
+	}
+
+	public void removeAdvisee(Student student) {
+		advisees.remove(student);
+	}
+
+	public void setAdvisees(List<Student> advisees) {
+		this.advisees = advisees;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setSalary(double salary) {
+		this.salary = salary;
+	}
+
+	@Override
+	public String toString() {
+		return id + ", " + name + ", " + deptName;
+	}
+
+
+	
 
 
 }

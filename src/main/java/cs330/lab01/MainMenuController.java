@@ -10,7 +10,8 @@ public class MainMenuController {
 	
 	@FXML
     private void switchToStudent() throws IOException {
-        App.setRoot("primary");
+        App.setRoot("studentView");
+        
     }
 	
 	@FXML
