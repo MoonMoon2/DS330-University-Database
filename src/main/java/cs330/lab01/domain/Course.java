@@ -24,7 +24,6 @@ public class Course implements Serializable {
 	 */
 	public Course() {
 		super();
-		
 	}
 
 	/**

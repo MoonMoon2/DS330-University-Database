@@ -14,7 +14,7 @@ public interface StudentDao {
 	
 	/**
 	 * Get a specific student from the database by the ID. If it does not exist, 
-	 * throws an ObjectNotFoundException
+	 * returns null
 	 * 
 	 * @param id id of the student you want to find
 	 * @return

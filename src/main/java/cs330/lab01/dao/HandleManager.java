@@ -1,6 +1,7 @@
 package cs330.lab01.dao;
 
 import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 public class HandleManager {
 	
@@ -10,6 +11,7 @@ public class HandleManager {
 	public static DataHolder dHold;
 	public static Scene scene;
 	public static DepartmentDao dDao;
+	public static Stage stage;
 	
 	static {
 		sDao = new DBStudentDao();

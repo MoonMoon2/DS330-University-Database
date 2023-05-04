@@ -1,6 +1,8 @@
 package cs330.lab01;
 
+import java.io.IOException;
 import java.util.Comparator;
+import java.util.function.UnaryOperator;
 
 import cs330.lab01.dao.DataHolder;
 import cs330.lab01.dao.DepartmentDao;
@@ -13,17 +15,32 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.stage.Stage;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.scene.Node;
+import javafx.scene.effect.GaussianBlur; 
+import javafx.scene.effect.ColorAdjust; 
 
 public class StudentViewController {
+	
+	private Stage primaryStage;
 
 
 	private StudentDao sDao = HandleManager.sDao;
@@ -60,22 +77,22 @@ public class StudentViewController {
 
 	@FXML
 	private Button createStudentBut;
+	
+	@FXML 
+	private VBox screen;
 
 	@SuppressWarnings("unchecked")
 	@FXML
 	private void initialize() {
 
-
 		/*
 		 * Prepare student data
 		 */
 
-		studentData = FXCollections.observableArrayList();
-
-		studentData.addAll(sDao.getAllStudents());
+		studentData = FXCollections.observableArrayList(sDao.getAllStudents());
 
 
-		TableColumn<Student, Integer> studIdCol = new TableColumn<>("Student ID Number");
+		TableColumn<Student, Integer> studIdCol = new TableColumn<>("ID");
 		studIdCol.setCellValueFactory(
 				new PropertyValueFactory<Student, Integer>("id"));
 
@@ -88,31 +105,54 @@ public class StudentViewController {
 				new PropertyValueFactory<Student, String>("deptName"));
 
 		TableColumn<Student, Integer> mentorIdCol = new TableColumn<>("Mentor ID");
-		mentorIdCol.setCellValueFactory(tf -> new ReadOnlyObjectWrapper<>(tf.getValue().getAdvisor().getId()));
+		mentorIdCol.setCellValueFactory(studWrapper -> new ReadOnlyObjectWrapper<>(studWrapper.getValue().getAdvisor().getId()));
 
 		TableColumn<Student, String> mentorNameCol = new TableColumn<>("Mentor Name");
-		mentorNameCol.setCellValueFactory(tf -> new ReadOnlyObjectWrapper<>(tf.getValue().getAdvisor().getName()));
+		mentorNameCol.setCellValueFactory(studWrapper -> new ReadOnlyObjectWrapper<>(studWrapper.getValue().getAdvisor().getName()));
 
 		TableColumn<Student, String> gpaCol = new TableColumn<>("GPA");
-		gpaCol.setCellValueFactory(tf -> new ReadOnlyObjectWrapper<>("%.2f".formatted((tf.getValue().getGpa()))));
+		gpaCol.setCellValueFactory(studWrapper -> new ReadOnlyObjectWrapper<>("%.2f".formatted((studWrapper.getValue().getGpa()))));
 
-		TableColumn<Student, Integer> credCol = new TableColumn<>("Total Credits");
-		credCol.setCellValueFactory(tf -> new ReadOnlyObjectWrapper<>(tf.getValue().getTotCred()));
+		TableColumn<Student, Integer> credCol = new TableColumn<>("Credits");
+		credCol.setCellValueFactory(studWrapper -> new ReadOnlyObjectWrapper<>(studWrapper.getValue().getTotCred()));
 
 
 		filteredStudents = new FilteredList<>(studentData, p -> true);
 
 		studentsTable.setItems(filteredStudents);
+		
+		
+		studIdCol.sortableProperty();
 
 
 		studentsTable.getColumns().addAll(studIdCol, nameCol, deptCol, gpaCol, credCol, mentorNameCol);
 
+		
+		/*
+		 * lambda generated single function interface implementation
+		 */
+		studentsTable.setOnMouseClicked((e) -> {
+			dHolder.setActiveStudent(studentsTable.getSelectionModel().getSelectedItem());
+			
+			if(e.getClickCount() == 2){
+
+				/*
+				 * Open the selectedStudent view
+				 */
+				try {
+					viewSelectedStudent(e);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		
+		studentsTable.setTooltip(new Tooltip("Double click a student to open"));
 
 		/*
 		 * Setup search bar
 		 */
-
-		searchBar.setEditable(true);
 
 		searchTerms = FXCollections.observableArrayList();
 
@@ -122,76 +162,13 @@ public class StudentViewController {
 
 		searchBar.setItems(searchTerms);
 
+		
+
 		/*
 		 * Setup the search types
 		 */
 		searchType.getItems().addAll("Student ID", "Student Name", "Major", "GPA", "Mentor Name", "Mentor ID");
 		searchType.setValue("Student Name");
-
-		
-		searchBar.onKeyReleasedProperty().addListener((obs, oldValue, newKeyValue) -> {
-			String newValue = searchBar.getValue();
-
-			switch (searchType.getValue()) {
-			case "Student ID":
-				filteredStudents.setPredicate(s -> String.valueOf(s.getId()).contains(newValue.trim()));
-				break;
-			case "Student Name":
-				filteredStudents.setPredicate(s -> s.getName().toLowerCase().contains(newValue.toLowerCase().trim()));
-				break;
-			case "Major":
-				filteredStudents.setPredicate(s -> s.getDeptName().toLowerCase().contains(newValue.toLowerCase().trim()));
-				break;
-			case "GPA":
-				filteredStudents.setPredicate(s -> String.valueOf("%.2f".formatted(s.getGpa())).contains(newValue.trim()));
-				break;
-			case "Mentor Name":
-				filteredStudents.setPredicate(s -> s.getAdvisor().getName().toLowerCase().contains(newValue.toLowerCase().trim()));
-				break;
-			case "Mentor ID":
-				filteredStudents.setPredicate(s -> String.valueOf(s.getAdvisor().getId()).contains(newValue.trim()));
-				break;
-			default:
-				filteredStudents.setPredicate(s -> s.getName().toLowerCase().contains(newValue.toLowerCase().trim()));
-				break;
-			}
-        });
-		
-		
-		
-		/*
-		searchBar.onKeyPressedProperty().addListener((obs, oldKeyEvent, newKeyEvent) -> {
-
-
-
-			String newValue = searchBar.getValue();
-
-			switch (searchType.getValue()) {
-			case "Student ID":
-				filteredStudents.setPredicate(s -> String.valueOf(s.getId()).contains(newValue.trim()));
-				break;
-			case "Student Name":
-				filteredStudents.setPredicate(s -> s.getName().toLowerCase().contains(newValue.toLowerCase().trim()));
-				break;
-			case "Major":
-				filteredStudents.setPredicate(s -> s.getDeptName().toLowerCase().contains(newValue.toLowerCase().trim()));
-				break;
-			case "GPA":
-				filteredStudents.setPredicate(s -> String.valueOf("%.2f".formatted(s.getGpa())).contains(newValue.trim()));
-				break;
-			case "Mentor Name":
-				filteredStudents.setPredicate(s -> s.getAdvisor().getName().toLowerCase().contains(newValue.toLowerCase().trim()));
-				break;
-			case "Mentor ID":
-				filteredStudents.setPredicate(s -> String.valueOf(s.getAdvisor().getId()).contains(newValue.trim()));
-				break;
-			default:
-				filteredStudents.setPredicate(s -> s.getName().toLowerCase().contains(newValue.toLowerCase().trim()));
-				break;
-			}
-
-		});
-		*/
 
 		/*
 		 * Anonymous listener for changes to searchType
@@ -202,65 +179,61 @@ public class StudentViewController {
 			 */
 			if (newVal != null) {
 				searchBar.setValue("");
-
-				/*
-				 * Remove all values from the searchbar dropdown
-				 */
-				searchBar.getItems().clear();
-
-				/*
-				 * Initiate the searchTerms array
-				 */
-				searchTerms = FXCollections.observableArrayList();
-
-				/*
-				 * Set the searchTerms array to match the search type
-				 */
-				switch (searchType.getSelectionModel().getSelectedItem()) {
-				case "Student ID":
-					studentData.forEach(stud -> {
-						searchTerms.add(String.valueOf(stud.getId()));
-					});
-					break;
-				case "Student Name":
-					studentData.forEach(stud -> {
-						searchTerms.add(stud.getName());
-					});
-					break;
-				case "Major":
-					studentData.forEach(stud -> {
-						searchTerms.add(stud.getDeptName());
-					});
-					break;
-				case "GPA":
-					studentData.forEach(stud -> {
-						searchTerms.add(String.valueOf("%.2f".formatted(stud.getGpa())));
-					});
-					break;
-				case "Mentor Name":
-					studentData.forEach(stud -> {
-						searchTerms.add(stud.getAdvisor().getName());
-					});
-					break;
-				case "Mentor ID":
-					studentData.forEach(stud -> {
-						searchTerms.add(String.valueOf(stud.getAdvisor().getId()));
-					});
-					break;
-				default:
-					studentData.forEach(stud -> {
-						searchTerms.add(stud.getName());
-					});
-					break;
-				}
-
-				searchBar.setItems(searchTerms);
 			}
+			/*
+			 * Remove all values from the searchbar dropdown
+			 */
+			searchBar.getItems().clear();
+
+			/*
+			 * Initiate the searchTerms array
+			 */
+			searchTerms = FXCollections.observableArrayList();
+
+			/*
+			 * Set the searchTerms array to match the search type
+			 */
+			switch (searchType.getSelectionModel().getSelectedItem()) {
+			case "Student ID":
+				studentData.forEach(stud -> {
+					searchTerms.add(String.valueOf(stud.getId()));
+				});
+				break;
+			case "Student Name":
+				studentData.forEach(stud -> {
+					searchTerms.add(stud.getName());
+				});
+				break;
+			case "Major":
+				studentData.forEach(stud -> {
+					searchTerms.add(stud.getDeptName());
+				});
+				break;
+			case "GPA":
+				studentData.forEach(stud -> {
+					searchTerms.add(String.valueOf("%.2f".formatted(stud.getGpa())));
+				});
+				break;
+			case "Mentor Name":
+				studentData.forEach(stud -> {
+					searchTerms.add(stud.getAdvisor().getName());
+				});
+				break;
+			case "Mentor ID":
+				studentData.forEach(stud -> {
+					searchTerms.add(String.valueOf(stud.getAdvisor().getId()));
+				});
+				break;
+			default:
+				studentData.forEach(stud -> {
+					searchTerms.add(stud.getName());
+				});
+				break;
+			}
+
+			searchBar.setItems(searchTerms);
+
 		});
-
-
-
-
 
 		/*
 		 * Prepare mentor data
@@ -298,48 +271,146 @@ public class StudentViewController {
 		newStudMajorDropdown.setItems(majors);
 
 
+		
+		/*
+		 * Setup integer only field
+		 */
+		
+		// code for unary operator found on StackOverflow
+		UnaryOperator<TextFormatter.Change> filter = change -> {
+		    String text = change.getText();
+
+		    if (text.matches("[0-9]*")) {
+		        return change;
+		    }
+
+		    return null;
+		};
+		
+		
+		TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+		newStudIdInput.setTextFormatter(textFormatter);
+		
+		newStudIdInput.setTooltip(new Tooltip("Integer-only field"));
 
 
 	}
 
 	@FXML
-	private void viewSelectedStudent() {
+	private void viewSelectedStudent(MouseEvent event) throws IOException {
 		dHolder.setActiveStudent(studentsTable.getSelectionModel().getSelectedItem());
-
+		System.out.println(dHolder.getActiveStudent());
+		
+		
+		Stage stage = new Stage();
+		
+		HandleManager.stage = stage;
+		
+        Parent root = FXMLLoader.load(App.class.getResource("displayStudent.fxml"));
+        
+        screen.setEffect(new GaussianBlur());
+        
+        
+        stage.setScene(new Scene(root));
+        stage.setTitle("Model Student Display");
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(
+            ((Node)event.getSource()).getScene().getWindow() );
+        stage.show();
+	}
+	
+	@FXML
+	private void clearBlur() {
+		screen.setEffect(null);
 	}
 
+	/**
+	 * Creates a new student from the form
+	 */
 	@FXML
 	private void createStudent() {
+		if (sDao.getStudent(Integer.valueOf(newStudIdInput.getText())) == null) {
+			Student newStudent = new Student(Integer.valueOf(newStudIdInput.getText()), newStudNameInput.getText(), newStudMajorDropdown.getValue(), newStudMentorDropdown.getValue());
+			sDao.createStudent(newStudent);
+		}
+		
+		updateStudents();
 
 	}
+	
+	private void updateStudents() {
+		studentData.setAll(sDao.getAllStudents());
+	}
 
+	/**
+	 * Updates the table and search bar dropdown to filter by the selected property
+	 */
 	@FXML
 	private void searchUpdate() {
-		String newValue = searchBar.getValue();
+		
+		updateStudents();
 
+		String newValue = searchBar.getEditor().getText();
+
+		if (newValue == null) {
+			return;
+		}
+
+		searchTerms = FXCollections.observableArrayList();
+
+		/*
+		 * 
+		 */
 		switch (searchType.getValue()) {
 		case "Student ID":
 			filteredStudents.setPredicate(s -> String.valueOf(s.getId()).contains(newValue.trim()));
+			filteredStudents.forEach(stud -> {
+				searchTerms.add(String.valueOf(stud.getId()));
+			});
 			break;
 		case "Student Name":
 			filteredStudents.setPredicate(s -> s.getName().toLowerCase().contains(newValue.toLowerCase().trim()));
+			filteredStudents.forEach(stud -> {
+				searchTerms.add(stud.getName());
+			});
 			break;
 		case "Major":
 			filteredStudents.setPredicate(s -> s.getDeptName().toLowerCase().contains(newValue.toLowerCase().trim()));
+			filteredStudents.forEach(stud -> {
+				searchTerms.add(stud.getDeptName());
+			});
 			break;
 		case "GPA":
 			filteredStudents.setPredicate(s -> String.valueOf("%.2f".formatted(s.getGpa())).contains(newValue.trim()));
+			filteredStudents.forEach(stud -> {
+				searchTerms.add(String.valueOf("%.2f".formatted(stud.getGpa())));
+			});
 			break;
 		case "Mentor Name":
 			filteredStudents.setPredicate(s -> s.getAdvisor().getName().toLowerCase().contains(newValue.toLowerCase().trim()));
+			filteredStudents.forEach(stud -> {
+				searchTerms.add(stud.getAdvisor().getName());
+			});
 			break;
 		case "Mentor ID":
 			filteredStudents.setPredicate(s -> String.valueOf(s.getAdvisor().getId()).contains(newValue.trim()));
+			filteredStudents.forEach(stud -> {
+				searchTerms.add(stud.getName());
+			});
 			break;
 		default:
 			filteredStudents.setPredicate(s -> s.getName().toLowerCase().contains(newValue.toLowerCase().trim()));
+			filteredStudents.forEach(stud -> {
+				searchTerms.add(stud.getName());
+			});
 			break;
 		}
+
+
+
+		studentsTable.setItems(filteredStudents);
+		searchBar.setItems(searchTerms);
+
 	}
 
 }

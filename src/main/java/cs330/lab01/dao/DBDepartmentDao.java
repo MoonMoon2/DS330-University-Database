@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
-import cs330.lab01.domain.Course;
-
 public class DBDepartmentDao extends C3poConnectionHandler implements DepartmentDao {
 
 	@Override

@@ -7,8 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.*;
-
 import cs330.lab01.dao.StartupDao;
 import cs330.lab01.dao.HandleManager;
 
@@ -22,7 +20,9 @@ public class App extends Application {
 	
 	public static final double PASSING_GRADE = 1.0;
 	
+	@SuppressWarnings("unused")
 	private StartupDao dao = new StartupDao();
+	@SuppressWarnings("unused")
 	private HandleManager hm = new HandleManager();
 	
 	
@@ -32,6 +32,7 @@ public class App extends Application {
 		
 		scene = new Scene(loadFXML("mainMenu"), 800, 600);;
 		HandleManager.scene = scene;
+		HandleManager.stage = stage;
 		stage.setScene(scene);
 		stage.show();
 

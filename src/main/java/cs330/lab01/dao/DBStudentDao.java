@@ -16,7 +16,7 @@ public class DBStudentDao extends C3poConnectionHandler implements StudentDao {
 
 	@Override
 	public Student getStudent(int id) {
-		Student rtnStud = new Student();
+		Student rtnStud = null;
 		/*
 		 * Create the connection and use a preparedstatement to insert the student ID
 		 */
@@ -210,6 +210,8 @@ public class DBStudentDao extends C3poConnectionHandler implements StudentDao {
 			statement.setString(2, stud.getDeptName());
 			statement.setDouble(3, stud.getTotCred());
 			statement.setInt(4, stud.getId());
+			
+			statement.executeUpdate();
 			
 			statement = conn.prepareStatement("update advisor set i_id = ? where s_id = ?");
 			

@@ -1,5 +1,8 @@
 package cs330.lab01.domain;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +13,7 @@ public class Transcript {
 	protected Student student;
 	protected List<Course> coursesTaken;
 	protected Map<Course, Double> gradePointsEarned;
+	protected Map<Course, String> letterGradeEarned;
 	protected double gpa;
 	
 	/**
@@ -17,11 +21,12 @@ public class Transcript {
 	 * @param coursesTaken
 	 * @param gradePointsEarned
 	 */
-	public Transcript(Student student, List<Course> coursesTaken, Map<Course, Double> gradePointsEarned) {
+	public Transcript(Student student, List<Course> coursesTaken, Map<Course, Double> gradePointsEarned, Map<Course, String> letterGradeEarned) {
 		super();
 		this.student = student;
 		this.coursesTaken = coursesTaken;
 		this.gradePointsEarned = gradePointsEarned;
+		this.letterGradeEarned = letterGradeEarned;
 		calcGPA();
 	}
 
@@ -81,6 +86,14 @@ public class Transcript {
 		this.student = student;
 	}
 
+	public Map<Course, String> getLetterGradeEarned() {
+		return letterGradeEarned;
+	}
+
+	public void setLetterGradeEarned(Map<Course, String> letterGradeEarned) {
+		this.letterGradeEarned = letterGradeEarned;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
@@ -109,6 +122,38 @@ public class Transcript {
 		
 		return creds;
 		
+	}
+	
+	/**
+	 * List of the semester and year combinations in the transcript
+	 * 
+	 * @return
+	 */
+	public List<String[]> getSemestersAndYears() {
+		Map<String, Integer> rtnSet = new HashMap<>();
+		for (Course c : coursesTaken) {
+			rtnSet.put(c.getSemester() + "," + c.getYear(), 0);
+		}
+		
+		List<String> rtnList = new ArrayList<>(rtnSet.keySet());
+		
+		rtnList.sort(new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				return o1.compareToIgnoreCase(o2);
+			}
+			
+		});
+
+		List<String[]> semesterAndYear = new ArrayList<>();
+		
+		for (String str : rtnList) {
+			semesterAndYear.add(str.split(","));
+		}
+		
+		
+		return semesterAndYear;
 	}
 	
 	

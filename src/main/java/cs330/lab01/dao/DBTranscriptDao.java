@@ -62,7 +62,7 @@ public class DBTranscriptDao extends C3poConnectionHandler implements Transcript
 			 * on t.course_id = c.course_id 
 			 * where stud_id = ?
 			 */
-			PreparedStatement statement = conn.prepareStatement("select t.course_id, t.id as stud_id, t.sec_id, t.semester, t.year, g.gp, c.title, c.dept_name, c.credits from takes t inner join grades g on t.grade = g.let_grade inner join course c on t.course_id = c.course_id where stud_id = ?");
+			PreparedStatement statement = conn.prepareStatement("select t.course_id, t.id as stud_id, t.sec_id, t.semester, t.year, t.grade, g.gp, c.title, c.dept_name, c.credits from takes t inner join grades g on t.grade = g.let_grade inner join course c on t.course_id = c.course_id where stud_id = ?");
 			
 			statement.setInt(1, studentId);
 			
@@ -70,6 +70,7 @@ public class DBTranscriptDao extends C3poConnectionHandler implements Transcript
 			
 			List<Course> courseList = new ArrayList<>();
 			List<Double> gradesList = new ArrayList<>();
+			List<String> letterGradesList = new ArrayList<>();
 			
 			/*
 			 * Populate two lists from the resultSet
@@ -77,6 +78,7 @@ public class DBTranscriptDao extends C3poConnectionHandler implements Transcript
 			while (rs.next()) {
 				courseList.add(generateCourseFromResultSet(rs));
 				gradesList.add(rs.getDouble("gp"));
+				letterGradesList.add(rs.getString("grade"));
 			}
 			
 			rs.close();
@@ -85,7 +87,7 @@ public class DBTranscriptDao extends C3poConnectionHandler implements Transcript
 			
 			Map<Course, Double> gradesMap = createCourseMapping(courseList, gradesList);
 			
-			return new Transcript(null, courseList, gradesMap);
+			return new Transcript(null, courseList, gradesMap, createGradeMapping(courseList, letterGradesList));
 			
 			
 			
@@ -111,6 +113,24 @@ public class DBTranscriptDao extends C3poConnectionHandler implements Transcript
 		
 		for (int i = 0; i < courses.size(); i++) {
 			map.put(courses.get(i), gradePoints.get(i));
+		}
+		
+		return map;
+	}
+	
+	/**
+	 * Takes two lists with matching length and turns them into a map from courses to gradePoints
+	 * 
+	 * @param courses a list of courses to be mapped
+	 * @param gradePoints a list of doubles to be mapped onto
+	 * @return a map from courses to gradePoints
+	 */
+	private Map<Course, String> createGradeMapping(List<Course> courses, List<String> grades) {
+		Map<Course, String> map = new HashMap<>();
+		
+		
+		for (int i = 0; i < courses.size(); i++) {
+			map.put(courses.get(i), grades.get(i));
 		}
 		
 		return map;
