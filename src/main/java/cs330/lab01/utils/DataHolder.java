@@ -1,4 +1,4 @@
-package cs330.lab01.dao;
+package cs330.lab01.utils;
 
 import cs330.lab01.domain.Student;
 

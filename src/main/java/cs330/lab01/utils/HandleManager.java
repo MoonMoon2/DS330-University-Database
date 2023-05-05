@@ -1,5 +1,13 @@
-package cs330.lab01.dao;
+package cs330.lab01.utils;
 
+import cs330.lab01.dao.DBDepartmentDao;
+import cs330.lab01.dao.DBInstructorDao;
+import cs330.lab01.dao.DBStudentDao;
+import cs330.lab01.dao.DBTranscriptDao;
+import cs330.lab01.dao.DepartmentDao;
+import cs330.lab01.dao.InstructorDao;
+import cs330.lab01.dao.StudentDao;
+import cs330.lab01.dao.TranscriptDao;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 

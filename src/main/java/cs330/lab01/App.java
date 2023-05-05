@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import cs330.lab01.dao.StartupDao;
-import cs330.lab01.dao.HandleManager;
+import cs330.lab01.utils.HandleManager;
 
 
 /**

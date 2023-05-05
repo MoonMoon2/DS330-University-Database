@@ -10,6 +10,7 @@ import java.util.List;
 import cs330.lab01.domain.Instructor;
 import cs330.lab01.domain.Student;
 import cs330.lab01.domain.Transcript;
+import cs330.lab01.utils.HandleManager;
 import cs330.lab01.utils.ObjectNotFoundException;
 
 public class DBStudentDao extends C3poConnectionHandler implements StudentDao {

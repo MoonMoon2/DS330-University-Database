@@ -3,9 +3,7 @@ package cs330.lab01;
 import java.util.ArrayList;
 import java.util.List;
 
-import cs330.lab01.dao.DataHolder;
 import cs330.lab01.dao.DepartmentDao;
-import cs330.lab01.dao.HandleManager;
 import cs330.lab01.dao.InstructorDao;
 import cs330.lab01.dao.StudentDao;
 import cs330.lab01.dao.TranscriptDao;
@@ -13,6 +11,8 @@ import cs330.lab01.domain.Course;
 import cs330.lab01.domain.Instructor;
 import cs330.lab01.domain.Student;
 import cs330.lab01.domain.Transcript;
+import cs330.lab01.utils.DataHolder;
+import cs330.lab01.utils.HandleManager;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -77,54 +77,9 @@ public class EditStudentController {
 	@FXML 
 	private Button loadDataButton;
 	
-	@SuppressWarnings("unchecked")
 	@FXML
-	private void initialize() {
-		
-		this.setStage(HandleManager.stage);
-		
-		displayedStudent = dHold.getActiveStudent();
-		studentTranscript = displayedStudent.getTranscript();
-		
-		/*
-		 * initialize values of header row
-		 */
-		studentIDLabel.setText(String.valueOf(displayedStudent.getId()));
-		
-		studentNameTextField.setText(displayedStudent.getName());
-		
-		potentialMajors = FXCollections.observableArrayList();
-		potentialAdvisors = FXCollections.observableArrayList();
-		
-		
-		
-		
-		/*
-		 * Toggle them to be non-editable
-		 */
-		
-		editStudentButton.setVisible(false);
-		
-		toggleHeaderEditable();
-		
-		/*
-		 * Add Hover tooltips for all ambiguous fields
-		 */
-		
-		
-		studentIDLabel.setTooltip(new Tooltip("Student id number"));
-		studentNameTextField.setTooltip(new Tooltip("Student last name"));
-		studentMajorChoiceBox.setTooltip(new Tooltip("Student major department"));
-		studentAdvisorChoiceBox.setTooltip(new Tooltip("Advisor id, name, and department"));
-		
-		loadDataButton.setTooltip(new Tooltip("Grab the data about this student from the database and display it"));
-		
-		generateTranscriptView();
-		
-		
-		
-		updateFieldsFromDB();
-		
+	private void closeWindow() {
+		stage.close();
 	}
 
 	/**
@@ -132,6 +87,10 @@ public class EditStudentController {
 	 */
 	@SuppressWarnings("unchecked")
 	private void generateTranscriptView() {
+		
+		transcriptAccordion.getPanes().clear();
+		
+		
 		/*
 		 * Create and setup panels for different semesters
 		 */
@@ -195,9 +154,9 @@ public class EditStudentController {
 			TableColumn<String, String> secondCol = new TableColumn<>("");
 			secondCol.setCellValueFactory(wrapper -> new ReadOnlyObjectWrapper<>(""));
 			
-			TableColumn<String, Double> gpaCol = new TableColumn<>("Average GPA");
+			TableColumn<String, String> gpaCol = new TableColumn<>("Average GPA");
 			final Double avgGPADouble = Double.valueOf(avgGPA);
-			gpaCol.setCellValueFactory(courseWrapper -> new ReadOnlyObjectWrapper<>(avgGPADouble));
+			gpaCol.setCellValueFactory(courseWrapper -> new ReadOnlyObjectWrapper<>("%.2f".formatted(avgGPADouble)));
 			
 			TableColumn<String, Integer> credsCol = new TableColumn<>("Credits");
 			final Integer totCredInteger = Integer.valueOf(totalCred);
@@ -237,10 +196,10 @@ public class EditStudentController {
 			 * Set up the table heights
 			 */
 			coursesInSemester.setFixedCellSize(25);
-			coursesInSemester.setPrefHeight(coursesInSemester.getItems().size()*(coursesInSemester.getFixedCellSize()) + 95);
+			coursesInSemester.setPrefHeight(coursesInSemester.getItems().size()*(coursesInSemester.getFixedCellSize()) + 30);
 			
 			semesterAverages.setFixedCellSize(25);
-			semesterAverages.setPrefHeight(semesterAverages.getItems().size()*(semesterAverages.getFixedCellSize()) + 95);
+			semesterAverages.setPrefHeight(semesterAverages.getItems().size()*(semesterAverages.getFixedCellSize()) + 30);
 			
 			/*
 			 * Create the frame title
@@ -287,8 +246,6 @@ public class EditStudentController {
 		TableColumn<Course, Integer> courseCreditsCol = new TableColumn<>("Credits");
 		courseCreditsCol.setCellValueFactory(new PropertyValueFactory<Course, Integer>("credits"));
 		
-		coursesInSemester.setPadding(new Insets(10, 10, 0, 10));
-		
 		coursesInSemester.getColumns().addAll(courseIdCol, courseTitleCol, courseGradeEarnedCol, courseCreditsCol);
 		
 		/*
@@ -317,9 +274,9 @@ public class EditStudentController {
 		TableColumn<String, String> secondCol = new TableColumn<>("");
 		secondCol.setCellValueFactory(wrapper -> new ReadOnlyObjectWrapper<>(""));
 		
-		TableColumn<String, Double> gpaCol = new TableColumn<>("Average GPA");
+		TableColumn<String, String> gpaCol = new TableColumn<>("Average GPA");
 		final Double avgGPADouble = Double.valueOf(avgGPA);
-		gpaCol.setCellValueFactory(courseWrapper -> new ReadOnlyObjectWrapper<>(avgGPADouble));
+		gpaCol.setCellValueFactory(courseWrapper -> new ReadOnlyObjectWrapper<>("%.2f".formatted(avgGPADouble)));
 		
 		TableColumn<String, Integer> credsCol = new TableColumn<>("Credits");
 		final Integer totCredInteger = Integer.valueOf(totalCred);
@@ -359,10 +316,10 @@ public class EditStudentController {
 		 * Set up the table heights
 		 */
 		coursesInSemester.setFixedCellSize(25);
-		coursesInSemester.setPrefHeight(coursesInSemester.getItems().size()*(coursesInSemester.getFixedCellSize()) + 95);
+		coursesInSemester.setPrefHeight(coursesInSemester.getItems().size()*(coursesInSemester.getFixedCellSize()) + 30);
 		
 		semesterAverages.setFixedCellSize(25);
-		semesterAverages.setPrefHeight(semesterAverages.getItems().size()*(semesterAverages.getFixedCellSize()) + 95);
+		semesterAverages.setPrefHeight(semesterAverages.getItems().size()*(semesterAverages.getFixedCellSize()) + 30);
 
 		/*
 		 * Setup border pane holding the tables
@@ -370,17 +327,80 @@ public class EditStudentController {
 		BorderPane innerPane = new BorderPane();
 		
 		
-		innerPane.setCenter(coursesInSemester);
-		innerPane.setBottom(semesterAverages);
+		innerPane.setCenter(semesterAverages);
+		innerPane.setBottom(coursesInSemester);
 		
 		/*
 		 * Final setup of the titled pane
 		 */
 		
-		TitledPane pane = new TitledPane("All Time", coursesInSemester);
+		TitledPane pane = new TitledPane("All Time", innerPane);
 		
 		pane.setPrefWidth(605);
 		transcriptAccordion.getPanes().add(pane);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@FXML
+	private void initialize() {
+		
+		this.setStage(HandleManager.stage);
+		
+		displayedStudent = dHold.getActiveStudent();
+		studentTranscript = displayedStudent.getTranscript();
+		
+		/*
+		 * initialize values of header row
+		 */
+		studentIDLabel.setText(String.valueOf(displayedStudent.getId()));
+		
+		studentNameTextField.setText(displayedStudent.getName());
+		
+		potentialMajors = FXCollections.observableArrayList();
+		potentialAdvisors = FXCollections.observableArrayList();
+		
+		
+		
+		
+		/*
+		 * Toggle them to be non-editable
+		 */
+		
+		editStudentButton.setVisible(false);
+		
+		toggleHeaderEditable();
+		
+		/*
+		 * Add Hover tooltips for all ambiguous fields
+		 */
+		
+		
+		studentIDLabel.setTooltip(new Tooltip("Student id number"));
+		studentNameTextField.setTooltip(new Tooltip("Student last name"));
+		studentMajorChoiceBox.setTooltip(new Tooltip("Student major department"));
+		studentAdvisorChoiceBox.setTooltip(new Tooltip("Advisor id, name, and department"));
+		
+		loadDataButton.setTooltip(new Tooltip("Grab the data about this student from the database and display it"));
+		
+		generateTranscriptView();
+
+		updateFieldsFromDB();
+		
+	}
+	
+	@FXML
+	private void saveUpdatedStudent() {
+		toggleHeaderEditable();
+		
+		displayedStudent.setName(studentNameTextField.getText());
+		displayedStudent.setDeptName(studentMajorChoiceBox.getValue());
+		displayedStudent.setAdvisor(studentAdvisorChoiceBox.getValue());
+		
+		sDao.updateStudent(displayedStudent);
+	}
+	
+	public void setStage(Stage newStage) {
+		this.stage = newStage;
 	}
 	
 	@FXML
@@ -400,17 +420,6 @@ public class EditStudentController {
 	}
 	
 	@FXML
-	private void saveUpdatedStudent() {
-		toggleHeaderEditable();
-		
-		displayedStudent.setName(studentNameTextField.getText());
-		displayedStudent.setDeptName(studentMajorChoiceBox.getValue());
-		displayedStudent.setAdvisor(studentAdvisorChoiceBox.getValue());
-		
-		sDao.updateStudent(displayedStudent);
-	}
-	
-	@FXML
 	private void updateFieldsFromDB() {
 		
 		sDao.refreshStudent(displayedStudent);
@@ -426,16 +435,9 @@ public class EditStudentController {
 		studentMajorChoiceBox.setValue(displayedStudent.getDeptName());
 		studentAdvisorChoiceBox.setValue(displayedStudent.getAdvisor());
 		
+		generateTranscriptView();
 		
-	}
-	
-	@FXML
-	private void closeWindow() {
-		stage.close();
-	}
-	
-	public void setStage(Stage newStage) {
-		this.stage = newStage;
+		
 	}
 
 }

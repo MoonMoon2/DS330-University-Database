@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.function.UnaryOperator;
 
-import cs330.lab01.dao.DataHolder;
 import cs330.lab01.dao.DepartmentDao;
-import cs330.lab01.dao.HandleManager;
 import cs330.lab01.dao.InstructorDao;
 import cs330.lab01.dao.StudentDao;
 import cs330.lab01.domain.Instructor;
 import cs330.lab01.domain.Student;
+import cs330.lab01.utils.DataHolder;
+import cs330.lab01.utils.HandleManager;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
